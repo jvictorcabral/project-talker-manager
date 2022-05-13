@@ -47,10 +47,12 @@ app.get('/talker/:id', (req, res, next) => {
 // https://stackoverflow.com/questions/8855687/secure-random-token-in-node-js
 app.post('/login', validateUser, (req, res, next) => {
   try {
-    crypto.randomBytes(16, (err, buffer) => {
-      const token = buffer.toString('hex');
-      return res.status(200).json(token);
-    });
+    // crypto.randomBytes(8, (err, buffer) => {
+    //   const token = buffer.toString('hex');
+    const token = crypto.randomBytes(8).toString('hex');
+    
+      return res.status(200).json({ token });
+    // });
   } catch (err) {
     next(err);
   }
