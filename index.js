@@ -1,7 +1,9 @@
 const express = require('express');
 const fs = require('fs');
 const bodyParser = require('body-parser');
-const errorMidware = require('./Midwares/errorMidware');
+const crypto = require('crypto');
+const errorMiddleware = require('./Middlewares/errorMiddleware');
+const validateUser = require('./Middlewares/validateUser');
 
 const dataBase = './talker.json';
 
@@ -41,7 +43,20 @@ app.get('/talker/:id', (req, res, next) => {
   }
 });
 
-app.use(errorMidware);
+// consegui gerar um Token com ajuda do Stackoverflow:
+// https://stackoverflow.com/questions/8855687/secure-random-token-in-node-js
+app.post('/login', validateUser, (req, res, next) => {
+  try {
+    crypto.randomBytes(16, (err, buffer) => {
+      const token = buffer.toString('hex');
+      return res.status(200).json(token);
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.use(errorMiddleware);
 
 app.listen(PORT, () => {
   console.log('Online');
