@@ -11,11 +11,11 @@ const USER = Joi.object({
       'string.email': 'O "email" deve ter o formato "email@email.com"',
     }),
   password: Joi.string().min(6).required()
-  .messages({
-    'string.empty': 'O campo "password" é obrigatório',
-    'any.required': 'O campo "password" é obrigatório',
-    'string.min': 'O "password" deve ter pelo menos 6 caracteres',
-  }),
+    .messages({
+      'string.empty': 'O campo "password" é obrigatório',
+      'any.required': 'O campo "password" é obrigatório',
+      'string.min': 'O "password" deve ter pelo menos 6 caracteres',
+    }),
 });
 
 const validateUser = (req, res, next) => {
