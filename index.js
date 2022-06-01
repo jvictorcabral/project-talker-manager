@@ -73,6 +73,26 @@ app.post('/login', validateUser, (req, res, next) => {
   }
 });
 
+app.put('/talker/:id', validateToken, validateTalker, async (req, res, next) => {
+  try {
+    const data = await fs.readFile(dataBase, 'utf-8');
+    const { name, age, talk } = req.body;
+    const id = +req.params.id;
+    const talkers = JSON.parse(data);
+    const index = talkers.findIndex((person) => person.id === id);
+    if (index) {
+      const talkerEdit = { id, name, age, talk };
+      talkers[index] = talkerEdit;
+      await fs.writeFile(dataBase, JSON.stringify(talkers));
+      return res.status(200).json(talkerEdit);
+    }
+    return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+});
+
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
