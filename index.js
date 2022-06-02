@@ -93,6 +93,22 @@ app.put('/talker/:id', validateToken, validateTalker, async (req, res, next) => 
   }
 });
 
+app.delete('/talker/:id', validateToken, async (req, res, next) => {
+  try {
+    const data = await fs.readFile(dataBase, 'utf-8');
+    const id = +req.params.id;
+    const talkers = JSON.parse(data);
+    const index = talkers.findIndex((person) => person.id === id);
+    const indexWithOutId = talkers.filter((person) => person.id !== id);
+    if (index) {
+      await fs.writeFile(dataBase, JSON.stringify(indexWithOutId));
+      res.status(204).end();
+    }
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
