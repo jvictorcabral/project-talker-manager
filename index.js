@@ -20,6 +20,21 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
+app.get('/talker/search', validateToken, async (req, res, next) => {
+  try {
+    const { q } = req.query;
+    const data = await fs.readFile(dataBase, 'utf-8');
+    const talkers = JSON.parse(data);
+    if (q) {
+      const searchTalker = talkers.filter((talker) => talker.name.includes(q));
+      return res.status(HTTP_OK_STATUS).json(searchTalker);
+    }
+    return res.status(HTTP_OK_STATUS).json(talkers);
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.get('/talker', async (_req, res, next) => {
   try {
     const data = JSON.parse(await fs.readFile(dataBase));
@@ -67,7 +82,7 @@ app.post('/login', validateUser, (req, res, next) => {
   try {
     const token = crypto.randomBytes(8).toString('hex');
     
-      return res.status(200).json({ token });
+      return res.status(HTTP_OK_STATUS).json({ token });
   } catch (err) {
     next(err);
   }
@@ -84,9 +99,9 @@ app.put('/talker/:id', validateToken, validateTalker, async (req, res, next) => 
       const talkerEdit = { id, name, age, talk };
       talkers[index] = talkerEdit;
       await fs.writeFile(dataBase, JSON.stringify(talkers));
-      return res.status(200).json(talkerEdit);
+      return res.status(HTTP_OK_STATUS).json(talkerEdit);
     }
-    return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+    return res.status(BAD_REQUEST).json({ message: 'Pessoa palestrante não encontrada' });
   } catch (err) {
     console.log(err);
     next(err);
@@ -99,8 +114,8 @@ app.delete('/talker/:id', validateToken, async (req, res, next) => {
     const id = +req.params.id;
     const talkers = JSON.parse(data);
     const index = talkers.findIndex((person) => person.id === id);
-    const indexWithOutId = talkers.filter((person) => person.id !== id);
     if (index) {
+      const indexWithOutId = talkers.filter((person) => person.id !== id);
       await fs.writeFile(dataBase, JSON.stringify(indexWithOutId));
       res.status(204).end();
     }
